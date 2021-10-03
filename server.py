@@ -7,7 +7,7 @@ class Server:
 
 	def __init__(self, constants):
 
-	# - - - - - - - - - - - - - - - - -Data structures for storing information - - - - - - - - - - - - - - # DONE
+	# - - - - - - - - - - - - - - - - -Data structures for storing information - - - - - - - - - - - - - ---------
 	
 		# for storing the name of all the clients
 		self.Client_list = constants.Client_list
@@ -37,13 +37,13 @@ class Server:
 		while True:
 			msg_rcvd = client.recv(2048).decode()
 			self.server_load()
-			if "fileusersend" in msg_rcvd.lower():   #DONE
+			if "fileusersend" in msg_rcvd.lower():   
 				PEER_NAME = msg_rcvd.split(" ")[1]
 				PEER_PORT = str(self.Client_ip_port[PEER_NAME])
 				msg_send = PEER_NAME+":"+PEER_PORT
 				client.send(bytes(msg_send, 'utf-8'))
 
-			elif "filegroupsend" in msg_rcvd.lower(): #DONE
+			elif "filegroupsend" in msg_rcvd.lower():
 				GRP_NAME = msg_rcvd.split(" ")[1]
 				portlist = ""
 				for user in self.UsersInGroup[GRP_NAME]:
@@ -56,7 +56,7 @@ class Server:
 				# print(portlist)
 				client.send(bytes(portlist, 'utf-8'))
 
-			elif "grpsend" in msg_rcvd.lower():          #DONE
+			elif "grpsend" in msg_rcvd.lower():          
 				GRP_NAME = msg_rcvd.split(" ")[1]
 				portlist = ""
 				for user in self.UsersInGroup[GRP_NAME]:
@@ -69,7 +69,7 @@ class Server:
 				# print(portlist)
 				client.send(bytes(portlist, 'utf-8'))
 
-			elif "create" in msg_rcvd.lower():          #DONE
+			elif "create" in msg_rcvd.lower():         
 				GRP_NAME = msg_rcvd.split(" ")[1]
 				if GRP_NAME not in self.Group_List:
 					self.Group_List.append(GRP_NAME)
@@ -79,7 +79,7 @@ class Server:
 					msg_send = "Group already exist"
 				client.send(bytes(msg_send, 'utf-8'))
 
-			elif "join" in msg_rcvd.lower():            #DONE
+			elif "join" in msg_rcvd.lower():           
 				GRP_NAME = msg_rcvd.split(" ")[1]
 				if GRP_NAME in self.Group_List:
 					if username in self.UsersInGroup[GRP_NAME]:
@@ -97,13 +97,13 @@ class Server:
 					msg_send = GRP_NAME+" created succesfully and "+username+" joined successfully."
 				client.send(bytes(msg_send, 'utf-8'))
 
-			elif "send" in msg_rcvd.lower():         #DONE
+			elif "send" in msg_rcvd.lower():        
 				PEER_NAME = msg_rcvd.split(" ")[1]
 				PEER_PORT = str(self.Client_ip_port[PEER_NAME])
 				msg_send = PEER_NAME+":"+PEER_PORT
 				client.send(bytes(msg_send, 'utf-8'))
 			
-			elif "listgrp" in msg_rcvd.lower():      #DONE
+			elif "listgrp" in msg_rcvd.lower():     
 				# print ("list group")
 				msg_send =""
 				for key in self.UsersInGroup:
@@ -120,7 +120,7 @@ class Server:
 
 			self.server_dump()
 
-	# - - - - - - - - - - - - - - - - - Signup and login for client - - - - - - - - - - - - - - # DONE
+	# - - - - - - - - - - - - - - - - - Signup and login for client - - - - - - - - - - - - - ----
 	def details_fetch(self, client):
 		client.send(bytes('Please enter your username and password - ', 'utf-8'))
 		user_response = client.recv(1024).decode("utf-8")
@@ -165,7 +165,7 @@ class Server:
 					RCV_THREAD.start()
 				else:
 					client.send(bytes('Wrong Username or password', 'utf-8'))
-					CLIENT_THREAD = Thread(target=self.client_signup_login, args=(client, addr,))   #?? why are we calling this thread again
+					CLIENT_THREAD = Thread(target=self.client_signup_login, args=(client, addr,))  
 					CLIENT_THREAD.start()
 
 			self.server_dump()
@@ -176,7 +176,7 @@ class Server:
 			CLIENT_THREAD.start()
 	
 	# - - - - - - - - - - - - - - - - - Starting Server - - - - - - - - - - - - - - #
-	def waiting_for_conn(self):     #DONE
+	def waiting_for_conn(self):    
 		while True:
 			client, addr = server.accept()
 
@@ -225,16 +225,16 @@ class Server:
 
 
 
-if __name__ == "__main__":      #DONE
+if __name__ == "__main__":     
 
 	MYPORT = int(input("Please assign a port number to this server - "))
 	MYIP = socket.gethostname()
-	MY_ADDR = (MYIP, MYPORT)       #MY_ADDR = Tuple
-	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # server = server's socket id
+	MY_ADDR = (MYIP, MYPORT)     
+	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	server.bind(MY_ADDR)
 	server.listen(10)
 	print("Hey, I am waiting for connections")
-	server_new = Server(constants)   #??
+	server_new = Server(constants) 
 	Create_conn_thread = Thread(target=server_new.waiting_for_conn)
 	Create_conn_thread.start()
-	Create_conn_thread.join()         #?? join is used for??
+	Create_conn_thread.join()        
