@@ -9,7 +9,7 @@ from pyDes import *
 class Client:
 	# - - - - - - - - - - - - - - - - -Data structures for storing information - - - - - - - - - - - - - - #
 
-	def __init__(self):            #DONE
+	def __init__(self):        
 
 		self.MYPORT = 1111
 		self.MYIP = socket.gethostname()
@@ -29,7 +29,7 @@ class Client:
 		self.privatekey = int(self.privatekey.hexdigest(), 16)        
 		self.x = int(pow(self.G,self.privatekey,self.P))
 		
-	def key(self, receiverkey):      #DONE
+	def key(self, receiverkey):    
 		print("Secret Key", pow(receiverkey, self.privatekey, self.P))
 		
 	def encrypt(self, message, receiverkey):
@@ -38,7 +38,7 @@ class Client:
 		shared_secret_key = pow(receiverkey, self.privatekey, self.P)
 		shared_secret_key = shared_secret_key.to_bytes(24, byteorder='little')
 		k = triple_des(shared_secret_key, CBC, initial_value_bits, pad=None, padmode=PAD_PKCS5)
-		encrypted_message = k.encrypt(message)          #???
+		encrypted_message = k.encrypt(message)        
 		return encrypted_message
 
 	def decrypt(self, encryptedMessage, senderkey):
@@ -50,7 +50,7 @@ class Client:
 		decrypted_message = k.decrypt(encryptedMessage, padmode=PAD_PKCS5)
 		return decrypted_message
 
-	def peer_send(self, peer, msg_send, flag): #DONE
+	def peer_send(self, peer, msg_send, flag):
 
 		if flag == 0:
 			peer.send(msg_send)
@@ -58,7 +58,7 @@ class Client:
 			peer.sendall(msg_send)
 		return peer
 
-	def send_msg(self):               #DONE
+	def send_msg(self):               
 		while True:
 			flag = 0
 			msg = input()
@@ -66,7 +66,7 @@ class Client:
 
 			if len(parsed) > 2:
 				parsed = msg.split(" ", maxsplit=2)
-				if parsed[0].lower() == "fileusersend":             #DONE
+				if parsed[0].lower() == "fileusersend":            
 					msg_send = "fileusersend "+parsed[1]
 					tracker_conn.send(bytes(msg_send, "utf-8"))
 					msg_rcvd = tracker_conn.recv(1024).decode("utf-8")
@@ -76,7 +76,7 @@ class Client:
 					try:
 						filePath = parsed[2]
 						fileName = parsed[2].split("/")[-1]
-						file = open(filePath, "rb")     #opens the file in binary format for reading
+						file = open(filePath, "rb")     
 						fileContent = file.read()
 						file.close()
 						peer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -96,7 +96,7 @@ class Client:
 					except:
 						print("FILE NOT SENT")
 
-				elif parsed[0].lower() == "filegroupsend":       #DONE
+				elif parsed[0].lower() == "filegroupsend":      
 					msg_send = "filegroupsend "+parsed[1]
 					tracker_conn.send(bytes(msg_send, "utf-8"))
 					msg_rcvd = tracker_conn.recv(1024).decode("utf-8")
@@ -132,7 +132,7 @@ class Client:
 						except:
 							print("FILE NOT SENT")
 
-				elif parsed[0].lower() == "send":       #DONE
+				elif parsed[0].lower() == "send":       
 					msg_send = "send "+parsed[1]
 					tracker_conn.send(bytes(msg_send, "utf-8"))
 					msg_rcvd = tracker_conn.recv(1024).decode("utf-8")
@@ -153,12 +153,12 @@ class Client:
 					peer = self.peer_send(peer, msg_encrypt, flag)
 					peer.close()
 
-				elif parsed[0].lower() == "grpsend": #DONE
+				elif parsed[0].lower() == "grpsend": 
 					msg_send = "grpsend "+parsed[1]
 					tracker_conn.send(bytes(msg_send, "utf-8"))
 					msg_rcvd = tracker_conn.recv(1024).decode("utf-8")
 					list1 = msg_rcvd.split(":")
-					print("<"+parsed[1]+">"+"<YOU>"+parsed[2])       #??
+					print("<"+parsed[1]+">"+"<YOU>"+parsed[2])      
 					# print(list1)
 					
 					for data in list1:
@@ -182,19 +182,19 @@ class Client:
 				msg_rcvd = tracker_conn.recv(1024).decode("utf-8")
 				print(msg_rcvd)
 
-			elif len(parsed) == 1:       #????
+			elif len(parsed) == 1:      
 				tracker_conn.send(bytes(parsed[0], "utf-8"))
 				msg_rcvd = tracker_conn.recv(1024).decode("utf-8")
 				msg_rcvd = msg_rcvd[:-1]
 				print(msg_rcvd)
 
-	def chat_start(self, username, MYPORT, MYIP):      #DONE
+	def chat_start(self, username, MYPORT, MYIP):      
 		Rcvd_msg = Thread(target=self.client_as_server, args=(MYPORT, MYIP))
 		Rcvd_msg.start()
 		Send_msg = Thread(target=self.send_msg, args=())
 		Send_msg.start()
 
-	def wait_for_messages(self, peer_server):          #DONE
+	def wait_for_messages(self, peer_server):          
 		while True:
 			client, _ = peer_server.accept()
 			y = client.recv(1024)
@@ -215,13 +215,13 @@ class Client:
 							F.write(fileData)
 							fileData = client.recv(1024)
 						F.close()
-					print("FILE RECEIVED SUCCESSFULLY AS:",newfileName)        # WHY IS SERVER RECIEVING A FILE
+					print("FILE RECEIVED SUCCESSFULLY AS:",newfileName)  
 				except:
 					pass
 			else:
 				print(msg)
 
-	def client_as_server(self, MYPORT, MYIP):     #DONE
+	def client_as_server(self, MYPORT, MYIP):     
 		# print("hello server2")
 		peer_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		peer_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -230,9 +230,9 @@ class Client:
 		peer_server.listen(2)
 		ACCEPT_THREAD = Thread(target=self.wait_for_messages, args=(peer_server,))
 		ACCEPT_THREAD.start()
-		ACCEPT_THREAD.join()                #WHY JOIN USED HERE
+		ACCEPT_THREAD.join()               
 
-	def login(self, username, pwd):  # WHY CONNECTION WITH THE TRACKER TWICE??
+	def login(self, username, pwd): 
 		# Tracker will ask for signin and signup
 		msg_rcvd = tracker_conn.recv(1024).decode("utf-8")
 		print(msg_rcvd)
@@ -244,16 +244,15 @@ class Client:
 		username = input("Enter Username: ")
 		pwd = input("Enter Password: ")
 		msg_send = username+" "+pwd+" "+str(MYPORT)
-		tracker_conn.send(bytes(msg_send, "utf-8"))  # username pwd sent to tracker
-		msg_rcvd = tracker_conn.recv(1024).decode(
-			"utf-8")  # Tracker will ask for username pwd
+		tracker_conn.send(bytes(msg_send, "utf-8"))  
+		msg_rcvd = tracker_conn.recv(1024).decode("utf-8") 
 		print(msg_rcvd)
 		if "SignIn Successful" in msg_rcvd:
 			return True, username, pwd
 		else:
 			return False, username, pwd
 
-	def printCommand(self): #DONE
+	def printCommand(self): 
 		print("LIST OF COMMANDS")
 		print("Send a message to User: SEND <USERNAME> <MESSAGE>")
 		print("Send a message to Group: GRPSEND <GROUPNAME> <MESSAGE>")
